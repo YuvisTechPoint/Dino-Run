@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-// TODO: Generate Hive adapter with: flutter packages pub run build_runner build
-// part 'character.g.dart';
+part 'character.g.dart';
 
 /// Enum representing different character abilities
 enum CharacterAbility {

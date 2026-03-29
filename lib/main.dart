@@ -51,12 +51,11 @@ Future<void> initHive() async {
   Hive.registerAdapter<Settings>(SettingsAdapter());
   Hive.registerAdapter<Achievement>(AchievementAdapter());
   Hive.registerAdapter<GameTheme>(GameThemeAdapter());
-  // TODO: Generate Hive adapters for new models
-  // Hive.registerAdapter<Wallet>(WalletAdapter());
-  // Hive.registerAdapter<ShopItem>(ShopItemAdapter());
-  // Hive.registerAdapter<DailyChallenge>(DailyChallengeAdapter());
-  // Hive.registerAdapter<Character>(CharacterAdapter());
-  // Hive.registerAdapter<PlayerStats>(PlayerStatsAdapter());
+  Hive.registerAdapter<Wallet>(WalletAdapter());
+  Hive.registerAdapter<ShopItem>(ShopItemAdapter());
+  Hive.registerAdapter<DailyChallenge>(DailyChallengeAdapter());
+  Hive.registerAdapter<Character>(CharacterAdapter());
+  Hive.registerAdapter<PlayerStats>(PlayerStatsAdapter());
 }
 
 // The main widget for this game.

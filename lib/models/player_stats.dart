@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+part 'player_stats.g.dart';
+
 /// Stores comprehensive gameplay statistics
-// TODO: Generate Hive adapter with: flutter packages pub run build_runner build
-// part 'player_stats.g.dart';
+@HiveType(typeId: 8)
 class PlayerStats extends ChangeNotifier with HiveObjectMixin {
   // Basic Stats
   @HiveField(0)

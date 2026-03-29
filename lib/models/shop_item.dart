@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+part 'shop_item.g.dart';
+
 /// Enum for different shop item categories
 enum ShopItemCategory {
   powerUp,
@@ -10,8 +12,7 @@ enum ShopItemCategory {
 }
 
 /// Represents an item available in the shop
-// TODO: Generate Hive adapter with: flutter packages pub run build_runner build
-// part 'shop_item.g.dart';
+@HiveType(typeId: 6)
 class ShopItem extends ChangeNotifier with HiveObjectMixin {
   @HiveField(0)
   final String id;
