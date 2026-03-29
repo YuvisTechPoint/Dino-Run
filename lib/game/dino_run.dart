@@ -19,6 +19,8 @@ import '/models/player_data.dart';
 import '/models/achievement.dart';
 import '/models/game_theme.dart';
 import '/managers/theme_manager.dart';
+import '/managers/asset_preloader.dart';
+import '/game/effects_manager.dart';
 import '/widgets/pause_menu.dart';
 import '/widgets/game_over_menu.dart';
 import '/widgets/achievement_notification.dart';
@@ -59,11 +61,15 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   late AchievementManager _achievementManager;
   late ThemeManager _themeManager;
   late ThemedParallax _themedParallax;
+  late EffectsManager _effectsManager;
+  late AssetPreloader _assetPreloader;
 
   Vector2 get virtualSize => camera.viewport.virtualSize;
   
   // Make theme manager accessible to other components
   ThemeManager get themeManager => _themeManager;
+  EffectsManager get effectsManager => _effectsManager;
+  AssetPreloader get assetPreloader => _assetPreloader;
 
   // This method get called while flame is preparing this game.
   @override
@@ -77,6 +83,8 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     settings = await _readSettings();
     _achievementManager = AchievementManager();
     _themeManager = ThemeManager();
+    _effectsManager = EffectsManager();
+    _assetPreloader = AssetPreloader();
 
     /// Initilize [AudioManager].
     await AudioManager.instance.init(_audioAssets, settings);
@@ -87,6 +95,12 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
 
     // Cache all the images.
     await images.loadAll(_imageAssets);
+    
+    // Preload all theme assets for instant access
+    await _assetPreloader.preloadAllAssets(images);
+    
+    // Set current theme for effects manager
+    _effectsManager.setCurrentTheme(_themeManager.currentTheme);
 
     // This makes the camera look at the center of the viewport.
     camera.viewfinder.position = camera.viewport.virtualSize * 0.5;
@@ -137,9 +151,6 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     // Check for achievements
     _achievementManager.checkAchievements(playerData.currentScore);
     
-    // Unlock themes based on score
-    _themeManager.unlockThemesByScore(playerData.currentScore);
-    
     // If number of lives is 0 or less, game is over.
     if (playerData.lives <= 0) {
       overlays.add(GameOverMenu.id);
@@ -148,6 +159,36 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
       AudioManager.instance.pauseBgm();
     }
     super.update(dt);
+  }
+
+  /// Update the current theme and refresh all game elements
+  Future<void> updateTheme(GameTheme newTheme) async {
+    // Update theme manager
+    await _themeManager.switchTheme(newTheme);
+    
+    // Update effects manager
+    _effectsManager.setCurrentTheme(newTheme);
+    
+    // Update themed components
+    _themedParallax.updateTheme(newTheme);
+    _themedGround.updateTheme(newTheme);
+    _enemyManager.updateTheme(newTheme);
+    _itemManager.updateTheme(newTheme);
+    
+    // Add new weather and special effects
+    final weatherEffects = _effectsManager.createWeatherEffect(virtualSize);
+    final specialEffects = _effectsManager.createSpecialEffects(virtualSize);
+    
+    // Remove old effects and add new ones
+    _effectsManager.clearAllEffects();
+    for (final effect in [...weatherEffects, ...specialEffects]) {
+      world.add(effect);
+    }
+    
+    // Update background music if available
+    if (newTheme.backgroundMusic != 'audio/default_theme.mp3') {
+      AudioManager.instance.startBgm(newTheme.backgroundMusic);
+    }
   }
 
   // This will get called for each tap on the screen.

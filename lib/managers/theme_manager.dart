@@ -44,10 +44,6 @@ class ThemeManager extends ChangeNotifier {
   
   /// Switch to a different theme
   Future<void> switchTheme(GameTheme theme) async {
-    if (!theme.unlocked) {
-      throw Exception('Theme is not unlocked');
-    }
-    
     _currentTheme = theme;
     await _saveCurrentTheme();
     notifyListeners();
