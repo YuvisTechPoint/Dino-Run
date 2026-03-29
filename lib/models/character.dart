@@ -1,21 +1,20 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'character.g.dart';
 
-/// Character types and abilities
-enum CharacterType {
-  dinoClassic,    // Balanced stats
-  dinoSpeed,      // High speed, low health
-  dinoTank,       // High health, low speed
-  dinoMystic,     // Special abilities
-  dinoScout,      // High jump, detection
-  dinoWarrior,    // Combat focused
-  dinoExplorer,   // Bonus coins
-  dinoPhoenix,    // Resurrection ability
+/// Enum representing different character abilities
+enum CharacterAbility {
+  none,
+  dash,           // Speed burst forward
+  doubleJump,     // Enhanced double jump
+  magnet,         // Coin magnet passive
+  shield,         // Temporary invincibility
+  glide,          // Slow fall after jump
+  tiny,           // Smaller hitbox
 }
 
-/// Character with unique abilities and stats
+/// Represents a playable character in the game
 @HiveType(typeId: 5)
 class Character extends ChangeNotifier with HiveObjectMixin {
   @HiveField(0)
@@ -25,341 +24,189 @@ class Character extends ChangeNotifier with HiveObjectMixin {
   final String name;
   
   @HiveField(2)
-  final CharacterType type;
-  
-  @HiveField(3)
   final String description;
   
+  @HiveField(3)
+  final String spriteSheetPath;
+  
   @HiveField(4)
-  final int baseHealth;
+  final CharacterAbility ability;
   
   @HiveField(5)
-  final double baseSpeed;
+  final double speedMultiplier;
   
   @HiveField(6)
-  final double baseJumpHeight;
+  final double jumpMultiplier;
   
   @HiveField(7)
-  final String spritePath;
+  final double hitboxScale;
   
   @HiveField(8)
-  final int unlockCost;
+  final int unlockCostCoins;
   
   @HiveField(9)
-  final String requirement;
+  final int unlockCostGems;
   
   @HiveField(10)
-  bool isUnlocked;
+  bool _isUnlocked;
   
   @HiveField(11)
-  int currentLevel;
+  int _playCount;
   
   @HiveField(12)
-  int experience;
-  
-  @HiveField(13)
-  Map<String, bool> unlockedAbilities = {};
+  int _highScore;
 
   Character({
     required this.id,
     required this.name,
-    required this.type,
     required this.description,
-    required this.baseHealth,
-    required this.baseSpeed,
-    required this.baseJumpHeight,
-    required this.spritePath,
-    this.unlockCost = 0,
-    this.requirement = 'Default',
-    this.isUnlocked = false,
-    this.currentLevel = 1,
-    this.experience = 0,
-  });
+    required this.spriteSheetPath,
+    required this.ability,
+    this.speedMultiplier = 1.0,
+    this.jumpMultiplier = 1.0,
+    this.hitboxScale = 1.0,
+    this.unlockCostCoins = 0,
+    this.unlockCostGems = 0,
+    bool isUnlocked = false,
+  })  : _isUnlocked = isUnlocked,
+        _playCount = 0,
+        _highScore = 0;
 
-  /// Get all predefined characters
-  static List<Character> getPredefinedCharacters() {
-    return [
-      Character(
-        id: 'dino_classic',
-        name: 'Classic Dino',
-        type: CharacterType.dinoClassic,
-        description: 'Balanced stats, perfect for beginners',
-        baseHealth: 5,
-        baseSpeed: 1.0,
-        baseJumpHeight: 1.0,
-        spritePath: 'DinoSprites - tard.png',
-        unlockCost: 0,
-        requirement: 'Default',
-        isUnlocked: true,
-      ),
-      
-      Character(
-        id: 'dino_speed',
-        name: 'Speed Dino',
-        type: CharacterType.dinoSpeed,
-        description: 'Lightning fast but fragile',
-        baseHealth: 3,
-        baseSpeed: 1.5,
-        baseJumpHeight: 1.2,
-        spritePath: 'characters/dino_speed.png',
-        unlockCost: 500,
-        requirement: 'Reach level 10',
-        isUnlocked: false,
-      ),
-      
-      Character(
-        id: 'dino_tank',
-        name: 'Tank Dino',
-        type: CharacterType.dinoTank,
-        description: 'Slow but durable',
-        baseHealth: 8,
-        baseSpeed: 0.8,
-        baseJumpHeight: 0.8,
-        spritePath: 'characters/dino_tank.png',
-        unlockCost: 750,
-        requirement: 'Complete 50 runs',
-        isUnlocked: false,
-      ),
-      
-      Character(
-        id: 'dino_mystic',
-        name: 'Mystic Dino',
-        type: CharacterType.dinoMystic,
-        description: 'Mystical powers and abilities',
-        baseHealth: 4,
-        baseSpeed: 1.0,
-        baseJumpHeight: 1.3,
-        spritePath: 'characters/dino_mystic.png',
-        unlockCost: 1000,
-        requirement: 'Unlock 5 achievements',
-        isUnlocked: false,
-      ),
-      
-      Character(
-        id: 'dino_scout',
-        name: 'Scout Dino',
-        type: CharacterType.dinoScout,
-        description: 'Excellent vision and agility',
-        baseHealth: 4,
-        baseSpeed: 1.2,
-        baseJumpHeight: 1.5,
-        spritePath: 'characters/dino_scout.png',
-        unlockCost: 1500,
-        requirement: 'Score 5000 points',
-        isUnlocked: false,
-      ),
-      
-      Character(
-        id: 'dino_warrior',
-        name: 'Warrior Dino',
-        type: CharacterType.dinoWarrior,
-        description: 'Combat specialist',
-        baseHealth: 6,
-        baseSpeed: 1.1,
-        baseJumpHeight: 1.0,
-        spritePath: 'characters/dino_warrior.png',
-        unlockCost: 2000,
-        requirement: 'Defeat 1000 enemies',
-        isUnlocked: false,
-      ),
-      
-      Character(
-        id: 'dino_explorer',
-        name: 'Explorer Dino',
-        type: CharacterType.dinoExplorer,
-        description: 'Finds extra coins and treasures',
-        baseHealth: 5,
-        baseSpeed: 1.0,
-        baseJumpHeight: 1.1,
-        spritePath: 'characters/dino_explorer.png',
-        unlockCost: 2500,
-        requirement: 'Collect 100 power-ups',
-        isUnlocked: false,
-      ),
-      
-      Character(
-        id: 'dino_phoenix',
-        name: 'Phoenix Dino',
-        type: CharacterType.dinoPhoenix,
-        description: 'Can resurrect once per run',
-        baseHealth: 5,
-        baseSpeed: 1.1,
-        baseJumpHeight: 1.2,
-        spritePath: 'characters/dino_phoenix.png',
-        unlockCost: 5000,
-        requirement: 'Reach level 50',
-        isUnlocked: false,
-      ),
-    ];
-  }
+  // Getters
+  bool get isUnlocked => _isUnlocked;
+  int get playCount => _playCount;
+  int get highScore => _highScore;
 
-  /// Get character icon based on type
-  IconData getCharacterIcon() {
-    switch (type) {
-      case CharacterType.dinoClassic:
-        return Icons.pets;
-      case CharacterType.dinoSpeed:
-        return Icons.flash_on;
-      case CharacterType.dinoTank:
-        return Icons.security;
-      case CharacterType.dinoMystic:
-        return Icons.auto_awesome;
-      case CharacterType.dinoScout:
-        return Icons.visibility;
-      case CharacterType.dinoWarrior:
-        return Icons.gavel;
-      case CharacterType.dinoExplorer:
-        return Icons.explore;
-      case CharacterType.dinoPhoenix:
-        return Icons.local_fire_department;
-    }
-  }
-
-  /// Get character color scheme
-  Color getCharacterColor() {
-    switch (type) {
-      case CharacterType.dinoClassic:
-        return Colors.green;
-      case CharacterType.dinoSpeed:
-        return Colors.blue;
-      case CharacterType.dinoTank:
-        return Colors.grey;
-      case CharacterType.dinoMystic:
-        return Colors.purple;
-      case CharacterType.dinoScout:
-        return Colors.orange;
-      case CharacterType.dinoWarrior:
-        return Colors.red;
-      case CharacterType.dinoExplorer:
-        return Colors.amber;
-      case CharacterType.dinoPhoenix:
-        return Colors.deepOrange;
-    }
-  }
-
-  /// Get special abilities for this character
-  List<String> getSpecialAbilities() {
-    switch (type) {
-      case CharacterType.dinoClassic:
-        return ['Balanced Stats', 'No Weaknesses'];
-      case CharacterType.dinoSpeed:
-        return ['Speed Boost', 'Quick Recovery', 'Double Jump'];
-      case CharacterType.dinoTank:
-        return ['Extra Health', 'Damage Resistance', 'Ground Slam'];
-      case CharacterType.dinoMystic:
-        return ['Magic Shield', 'Teleport', 'Time Slow'];
-      case CharacterType.dinoScout:
-        return ['Enemy Detection', 'High Jump', 'Safe Landing'];
-      case CharacterType.dinoWarrior:
-        return ['Combat Bonus', 'Enemy Stun', 'Rage Mode'];
-      case CharacterType.dinoExplorer:
-        return ['Coin Magnet', 'Treasure Finder', 'Map Reveal'];
-      case CharacterType.dinoPhoenix:
-        return ['Resurrection', 'Fire Trail', 'Immunity Frames'];
-    }
-  }
-
-  /// Get ability descriptions
-  Map<String, String> getAbilityDescriptions() {
-    switch (type) {
-      case CharacterType.dinoClassic:
-        return {
-          'Balanced Stats': 'No strengths or weaknesses',
-          'No Weaknesses': 'Well-rounded performance',
-        };
-      case CharacterType.dinoSpeed:
-        return {
-          'Speed Boost': '+50% movement speed',
-          'Quick Recovery': 'Faster stun recovery',
-          'Double Jump': 'Jump again in mid-air',
-        };
-      case CharacterType.dinoTank:
-        return {
-          'Extra Health': '+3 additional lives',
-          'Damage Resistance': '50% damage reduction',
-          'Ground Slam': 'Stun nearby enemies',
-        };
-      case CharacterType.dinoMystic:
-        return {
-          'Magic Shield': 'Absorb one hit per run',
-          'Teleport': 'Short range teleport',
-          'Time Slow': 'Slow down time briefly',
-        };
-      case CharacterType.dinoScout:
-        return {
-          'Enemy Detection': 'See enemies through walls',
-          'High Jump': '+50% jump height',
-          'Safe Landing': 'No fall damage',
-        };
-      case CharacterType.dinoWarrior:
-        return {
-          'Combat Bonus': '+2x score from enemies',
-          'Enemy Stun': 'Stun enemies on contact',
-          'Rage Mode': 'Temporary invincibility',
-        };
-      case CharacterType.dinoExplorer:
-        return {
-          'Coin Magnet': 'Attract nearby coins',
-          'Treasure Finder': 'Reveal hidden items',
-          'Map Reveal': 'Show upcoming obstacles',
-        };
-      case CharacterType.dinoPhoenix:
-        return {
-          'Resurrection': 'Revive once per run',
-          'Fire Trail': 'Leave damaging trail',
-          'Immunity Frames': 'Brief invincibility after hit',
-        };
-    }
-  }
-
-  /// Unlock this character
+  /// Unlock the character
   void unlock() {
-    if (!isUnlocked) {
-      isUnlocked = true;
+    if (!_isUnlocked) {
+      _isUnlocked = true;
       notifyListeners();
       save();
     }
   }
 
-  /// Add experience to character
-  void addExperience(int exp) {
-    experience += exp;
-    
-    // Level up logic (100 exp per level)
-    while (experience >= currentLevel * 100 && currentLevel < 10) {
-      experience -= currentLevel * 100;
-      currentLevel++;
+  /// Record a play session
+  void recordPlay() {
+    _playCount++;
+    notifyListeners();
+    save();
+  }
+
+  /// Update high score if beaten
+  void updateHighScore(int score) {
+    if (score > _highScore) {
+      _highScore = score;
       notifyListeners();
+      save();
     }
-    
-    notifyListeners();
-    save();
   }
 
-  /// Unlock ability
-  void unlockAbility(String abilityName) {
-    unlockedAbilities[abilityName] = true;
-    notifyListeners();
-    save();
+  /// Get ability description
+  String get abilityDescription {
+    switch (ability) {
+      case CharacterAbility.none:
+        return 'Balanced stats, no special ability';
+      case CharacterAbility.dash:
+        return 'Tap twice to dash forward';
+      case CharacterAbility.doubleJump:
+        return 'Higher double jump with glide';
+      case CharacterAbility.magnet:
+        return 'Automatically attracts nearby coins';
+      case CharacterAbility.shield:
+        return 'Starts with temporary shield';
+      case CharacterAbility.glide:
+        return 'Hold jump to glide slowly';
+      case CharacterAbility.tiny:
+        return 'Smaller hitbox, easier to dodge';
+    }
   }
 
-  /// Check if ability is unlocked
-  bool isAbilityUnlocked(String abilityName) {
-    return unlockedAbilities[abilityName] ?? false;
+  /// Get formatted cost string
+  String get costString {
+    if (unlockCostGems > 0) {
+      return '$unlockCostGems Gems';
+    } else if (unlockCostCoins > 0) {
+      return '$unlockCostCoins Coins';
+    }
+    return 'Free';
   }
 
-  /// Get current health based on level
-  int getCurrentHealth() {
-    return baseHealth + (currentLevel - 1);
+  /// Check if character can be unlocked with given resources
+  bool canUnlock(int availableCoins, int availableGems) {
+    if (_isUnlocked) return true;
+    return availableCoins >= unlockCostCoins && availableGems >= unlockCostGems;
   }
 
-  /// Get current speed based on level
-  double getCurrentSpeed() {
-    return baseSpeed + (currentLevel - 1) * 0.05;
-  }
-
-  /// Get current jump height based on level
-  double getCurrentJumpHeight() {
-    return baseJumpHeight + (currentLevel - 1) * 0.03;
+  /// Get predefined characters
+  static List<Character> getPredefinedCharacters() {
+    return [
+      Character(
+        id: 'dino',
+        name: 'Dino',
+        description: 'The classic dinosaur. Balanced and reliable.',
+        spriteSheetPath: 'DinoSprites - tard.png',
+        ability: CharacterAbility.none,
+        speedMultiplier: 1.0,
+        jumpMultiplier: 1.0,
+        hitboxScale: 1.0,
+        isUnlocked: true,
+      ),
+      Character(
+        id: 'speedy',
+        name: 'Speedy',
+        description: 'Fast as lightning! Dash ability for quick escapes.',
+        spriteSheetPath: 'characters/speedy.png',
+        ability: CharacterAbility.dash,
+        speedMultiplier: 1.2,
+        jumpMultiplier: 0.9,
+        hitboxScale: 1.0,
+        unlockCostCoins: 500,
+      ),
+      Character(
+        id: 'jumper',
+        name: 'Jumper',
+        description: 'Can jump higher than anyone. Great for coin collecting!',
+        spriteSheetPath: 'characters/jumper.png',
+        ability: CharacterAbility.doubleJump,
+        speedMultiplier: 0.95,
+        jumpMultiplier: 1.3,
+        hitboxScale: 1.0,
+        unlockCostCoins: 1000,
+      ),
+      Character(
+        id: 'collector',
+        name: 'Collector',
+        description: 'Coin magnet passive. Perfect for building wealth.',
+        spriteSheetPath: 'characters/collector.png',
+        ability: CharacterAbility.magnet,
+        speedMultiplier: 0.9,
+        jumpMultiplier: 1.0,
+        hitboxScale: 1.0,
+        unlockCostCoins: 2000,
+      ),
+      Character(
+        id: 'tank',
+        name: 'Tank',
+        description: 'Larger but tougher. Can take more hits.',
+        spriteSheetPath: 'characters/tank.png',
+        ability: CharacterAbility.shield,
+        speedMultiplier: 0.85,
+        jumpMultiplier: 0.9,
+        hitboxScale: 1.2,
+        unlockCostGems: 50,
+      ),
+      Character(
+        id: 'ninja',
+        name: 'Ninja',
+        description: 'Small and nimble. Harder to hit!',
+        spriteSheetPath: 'characters/ninja.png',
+        ability: CharacterAbility.tiny,
+        speedMultiplier: 1.1,
+        jumpMultiplier: 1.0,
+        hitboxScale: 0.75,
+        unlockCostGems: 100,
+      ),
+    ];
   }
 }

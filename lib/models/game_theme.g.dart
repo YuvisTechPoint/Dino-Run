@@ -29,13 +29,17 @@ class GameThemeAdapter extends TypeAdapter<GameTheme> {
       collectibleType: fields[9] as String,
       powerUpType: fields[10] as String,
       isUnlocked: fields[11] as bool,
+      specialEffects: (fields[12] as List).cast<String>(),
+      backgroundMusic: fields[13] as String,
+      particleEffects: (fields[14] as List).cast<String>(),
+      weatherEffect: fields[15] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, GameTheme obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.type)
       ..writeByte(1)
@@ -59,7 +63,15 @@ class GameThemeAdapter extends TypeAdapter<GameTheme> {
       ..writeByte(10)
       ..write(obj.powerUpType)
       ..writeByte(11)
-      ..write(obj.isUnlocked);
+      ..write(obj.isUnlocked)
+      ..writeByte(12)
+      ..write(obj.specialEffects)
+      ..writeByte(13)
+      ..write(obj.backgroundMusic)
+      ..writeByte(14)
+      ..write(obj.particleEffects)
+      ..writeByte(15)
+      ..write(obj.weatherEffect);
   }
 
   @override

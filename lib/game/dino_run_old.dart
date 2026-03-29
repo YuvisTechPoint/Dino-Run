@@ -1,39 +1,44 @@
+import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
-import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:hive/hive.dart';
-import 'package:flame/parallax.dart';
+import 'package:flame/palette.dart';
+import 'package:flame/sprite.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
-import 'package:flame/components.dart';
-
-import '/game/dino.dart';
-import '/widgets/hud.dart';
-import '/models/settings.dart';
-import '/game/audio_manager.dart';
-import '/game/themed_enemy_manager.dart';
-import '/game/themed_parallax.dart';
-import '/game/themed_item_manager.dart';
-import '/game/themed_ground.dart';
-import '/game/coin.dart';
-import '/models/player_data.dart';
-import '/models/achievement.dart';
-import '/models/game_theme.dart';
-import '/models/wallet.dart';
-import '/models/player_stats.dart';
-import '/managers/theme_manager.dart';
-import '/managers/asset_preloader.dart';
-import '/managers/shop_manager.dart';
-import '/managers/challenge_manager.dart';
-import '/managers/character_manager.dart';
-import '/game/effects_manager.dart';
-import '/widgets/pause_menu.dart';
-import '/widgets/game_over_menu.dart';
-import '/widgets/achievement_notification.dart';
-import '/widgets/shop_menu.dart';
-import '/widgets/challenges_menu.dart';
-import '/widgets/stats_menu.dart';
-import '/widgets/character_selection_menu.dart';
+import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:math';
+import 'dino.dart';
+import 'enemy.dart';
+import 'enemy_manager.dart';
+import 'themed_enemy_manager.dart';
+import 'item_manager.dart';
+import 'themed_item_manager.dart';
+import 'themed_parallax.dart';
+import 'themed_ground.dart';
+import 'themed_coin.dart';
+import 'themed_power_up.dart';
+import 'themed_background.dart';
+import '../managers/theme_manager.dart';
+import '../managers/asset_preloader.dart';
+import '../managers/character_manager.dart';
+import '../managers/effects_manager.dart';
+import '../models/player_data.dart';
+import '../models/player_profile.dart';
+import '../models/character.dart';
+import '../models/daily_challenge.dart';
+import '../models/skill_tree.dart';
+import '../models/game_theme.dart';
+import '../widgets/enhanced_hud.dart';
+import '../widgets/hud.dart';
+import '../widgets/game_over_menu.dart';
+import '../widgets/pause_menu.dart';
+import '../widgets/theme_selection_menu.dart';
+import '../widgets/theme_preview.dart';
+import '../audio/audio_manager.dart';
+import 'boss_battle.dart';
 
 // This is the main flame game class.
 class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
@@ -65,8 +70,6 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   late Dino _dino;
   late Settings settings;
   late PlayerData playerData;
-  late Wallet wallet;
-  late PlayerStats playerStats;
   late ThemedEnemyManager _enemyManager;
   late ThemedItemManager _itemManager;
   late ThemedGround _themedGround;
@@ -75,17 +78,24 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   late ThemedParallax _themedParallax;
   late EffectsManager _effectsManager;
   late AssetPreloader _assetPreloader;
-  late ShopManager _shopManager;
-  late ChallengeManager _challengeManager;
+  late PlayerProfile _playerProfile;
   late CharacterManager _characterManager;
-  late CoinManager _coinManager;
+  late DailyChallengeManager _challengeManager;
+  late SkillTreeManager _skillManager;
+  late BossBattleManager _bossManager;
+  late EnhancedHud _enhancedHud;
 
   Vector2 get virtualSize => camera.viewport.virtualSize;
   
-  // Make theme manager accessible to other components
+  // Make managers accessible to other components
   ThemeManager get themeManager => _themeManager;
   EffectsManager get effectsManager => _effectsManager;
   AssetPreloader get assetPreloader => _assetPreloader;
+  PlayerProfile get playerProfile => _playerProfile;
+  CharacterManager get characterManager => _characterManager;
+  DailyChallengeManager get challengeManager => _challengeManager;
+  SkillTreeManager get skillManager => _skillManager;
+  BossBattleManager get bossManager => _bossManager;
 
   // This method get called while flame is preparing this game.
   @override
@@ -97,15 +107,15 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     /// Read [PlayerData] and [Settings] from hive.
     playerData = await _readPlayerData();
     settings = await _readSettings();
-    wallet = await Wallet.load();
-    playerStats = await PlayerStats.load();
     _achievementManager = AchievementManager();
     _themeManager = ThemeManager();
     _effectsManager = EffectsManager();
     _assetPreloader = AssetPreloader();
-    _shopManager = ShopManager(wallet);
-    _challengeManager = ChallengeManager(wallet);
-    _characterManager = CharacterManager(wallet);
+    _playerProfile = await _readPlayerProfile();
+    _characterManager = CharacterManager();
+    _challengeManager = DailyChallengeManager();
+    _skillManager = SkillTreeManager();
+    _bossManager = BossBattleManager();
 
     /// Initilize [AudioManager].
     await AudioManager.instance.init(_audioAssets, settings);
@@ -141,15 +151,10 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     _dino = Dino(images.fromCache('DinoSprites - tard.png'), playerData);
     _enemyManager = ThemedEnemyManager();
     _itemManager = ThemedItemManager();
-    _coinManager = CoinManager(wallet, playerData);
 
     world.add(_dino);
     world.add(_enemyManager);
     world.add(_itemManager);
-    world.add(_coinManager);
-    
-    // Record character play
-    _characterManager.recordPlay();
   }
 
   // This method remove all the actors from the game.
@@ -159,8 +164,6 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     _enemyManager.removeFromParent();
     _itemManager.removeAllItems();
     _itemManager.removeFromParent();
-    _coinManager.removeAllCoins();
-    _coinManager.removeFromParent();
   }
 
   // This method reset the whole game world to initial state.
@@ -179,42 +182,31 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     // Check for achievements
     _achievementManager.checkAchievements(playerData.currentScore);
     
-    // Track score progress for challenges
-    _challengeManager.trackScore(playerData.currentScore);
+    // Check for boss battle trigger
+    checkBossBattleTrigger(playerData.currentScore);
+    
+    // Update daily streak
+    _playerProfile.updateDailyStreak();
     
     // If number of lives is 0 or less, game is over.
     if (playerData.lives <= 0) {
-      _handleGameOver();
+      // Update game statistics before game over
+      updateGameStats(
+        score: playerData.currentScore,
+        distance: (playerData.currentScore * 10).floor(), // Estimate distance
+        enemiesDefeated: _enemyManager.enemies.length, // Simplified
+        powerUpsCollected: _itemManager.items.length, // Simplified
+        tookDamage: playerData.lives < 5,
+        timeElapsed: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Simplified
+        maxCombo: playerData.comboCount,
+      );
+      
+      overlays.add(GameOverMenu.id);
+      overlays.remove(Hud.id);
+      pauseEngine();
+      AudioManager.instance.pauseBgm();
     }
     super.update(dt);
-  }
-  
-  /// Handle game over - record stats and show menu
-  void _handleGameOver() {
-    // Record run statistics
-    playerStats.recordRun(
-      score: playerData.currentScore,
-      duration: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Placeholder
-      distance: playerData.currentScore * 2, // Approximate conversion
-      coins: wallet.totalCoinsEarned,
-      themeId: _themeManager.currentTheme.type.toString(),
-      characterId: _characterManager.selectedCharacter.id,
-      combo: playerData.comboCount,
-    );
-    
-    // Update character high score
-    _characterManager.updateHighScore(playerData.currentScore);
-    
-    // Track theme play for challenges
-    _challengeManager.trackThemePlay(
-      _themeManager.currentTheme.type.toString(),
-      playerData.currentScore,
-    );
-    
-    overlays.add(GameOverMenu.id);
-    overlays.remove(Hud.id);
-    pauseEngine();
-    AudioManager.instance.pauseBgm();
   }
 
   /// Update the current theme and refresh all game elements
@@ -290,6 +282,23 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     return settingsBox.get('DinoRun.Settings')!;
   }
 
+  /// This method reads [PlayerProfile] from the hive box.
+  Future<PlayerProfile> _readPlayerProfile() async {
+    final profileBox = await Hive.openBox<PlayerProfile>(
+      'DinoRun.PlayerProfileBox',
+    );
+    final profile = profileBox.get('DinoRun.PlayerProfile');
+
+    // If data is null, this is probably a fresh launch of the game.
+    if (profile == null) {
+      // In such cases store default values in hive.
+      await profileBox.put('DinoRun.PlayerProfile', PlayerProfile());
+    }
+
+    // Now it is safe to return the stored value.
+    return profileBox.get('DinoRun.PlayerProfile')!;
+  }
+
   @override
   void lifecycleStateChange(AppLifecycleState state) {
     switch (state) {
@@ -315,5 +324,110 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
         break;
     }
     super.lifecycleStateChange(state);
+  }
+
+  /// Start boss battle
+  void startBossBattle() {
+    if (!_bossManager.isBossActive) {
+      final currentTheme = _themeManager.currentTheme;
+      _bossManager.startBossBattle(
+        currentTheme.type,
+        Vector2(virtualSize.x * 0.8, virtualSize.y * 0.5),
+      );
+    }
+  }
+
+  /// Update game statistics after run
+  void updateGameStats({
+    required int score,
+    required int distance,
+    required int enemiesDefeated,
+    required int powerUpsCollected,
+    required bool tookDamage,
+    required int timeElapsed,
+    int maxCombo = 0,
+  }) {
+    _playerProfile.updateGameStats(
+      score: score,
+      distance: distance,
+      enemiesDefeated: enemiesDefeated,
+      powerUpsCollected: powerUpsCollected,
+      tookDamage: tookDamage,
+      themeUsed: _themeManager.currentTheme.type.toString(),
+    );
+
+    // Check daily challenges
+    _challengeManager.checkChallenges(
+      score: score,
+      distance: distance,
+      coins: score ~/ 10, // Estimate coins from score
+      enemies: enemiesDefeated,
+      powerUps: powerUpsCollected,
+      perfectRun: !tookDamage,
+      timeElapsed: timeElapsed,
+      themeUsed: _themeManager.currentTheme.type.toString(),
+      characterUsed: _characterManager.selectedCharacter?.id ?? 'dino_classic',
+      maxCombo: maxCombo,
+    );
+
+    // Add character experience
+    _characterManager.addCharacterExperience(score ~/ 5);
+
+    // Update player title based on level
+    _playerProfile.updateTitle();
+  }
+
+  /// Get comprehensive game statistics
+  Map<String, dynamic> getGameStatistics() {
+    return {
+      'playerProfile': {
+        'name': _playerProfile.playerName,
+        'level': _playerProfile.playerLevel,
+        'experience': _playerProfile.experiencePoints,
+        'totalCoins': _playerProfile.totalCoins,
+        'totalGamesPlayed': _playerProfile.totalGamesPlayed,
+        'totalPlayTime': _playerProfile.totalPlayTime,
+        'longestRun': _playerProfile.longestRun,
+        'totalDistance': _playerProfile.totalDistance,
+        'totalEnemiesDefeated': _playerProfile.totalEnemiesDefeated,
+        'totalPowerUpsCollected': _playerProfile.totalPowerUpsCollected,
+        'perfectRuns': _playerProfile.perfectRuns,
+        'currentStreak': _playerProfile.currentStreak,
+        'title': _playerProfile.getCurrentTitle(),
+      },
+      'characterStats': {
+        'selectedCharacter': _characterManager.selectedCharacter?.name ?? 'None',
+        'unlockedCharacters': _characterManager.getUnlockedCharacters().length,
+        'totalCharacters': _characterManager.characters.length,
+      },
+      'achievementStats': {
+        'totalAchievements': _achievementManager.totalCount,
+        'unlockedAchievements': _achievementManager.unlockedCount,
+      },
+      'challengeStats': {
+        'completedToday': _challengeManager.completedCount,
+        'totalChallenges': _challengeManager.challenges.length,
+        'coinsAvailable': _challengeManager.getTotalCoinsAvailable(),
+        'experienceAvailable': _challengeManager.getTotalExperienceAvailable(),
+      },
+      'skillStats': {
+        'totalSkillLevel': _skillManager.getTotalSkillLevel(),
+        'unlockedSkills': _skillManager.getUnlockedSkills().length,
+        'skillPoints': _skillManager.skillPoints,
+      },
+      'bossStats': {
+        'bossesDefeated': _bossManager.bossesDefeated,
+        'defeatedBossTypes': _bossManager.defeatedBossTypes.length,
+        'isBossActive': _bossManager.isBossActive,
+      },
+    };
+  }
+
+  /// Trigger boss battle at certain score thresholds
+  void checkBossBattleTrigger(int score) {
+    // Trigger boss battle every 5000 points
+    if (score > 0 && score % 5000 == 0 && !_bossManager.isBossActive) {
+      startBossBattle();
+    }
   }
 }

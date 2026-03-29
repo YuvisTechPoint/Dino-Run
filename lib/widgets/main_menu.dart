@@ -7,6 +7,10 @@ import '/game/dino_run.dart';
 import '/widgets/settings_menu.dart';
 import '/widgets/achievements_view.dart';
 import '/widgets/theme_selection_menu.dart';
+import '/widgets/shop_menu.dart';
+import '/widgets/challenges_menu.dart';
+import '/widgets/stats_menu.dart';
+import '/widgets/character_selection_menu.dart';
 
 // This represents the main menu overlay.
 class MainMenu extends StatelessWidget {
@@ -52,42 +56,47 @@ class MainMenu extends StatelessWidget {
                     },
                     child: const Text('Play', style: TextStyle(fontSize: 30)),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      game.overlays.remove(MainMenu.id);
-                      game.overlays.add(SettingsMenu.id);
-                    },
-                    child: const Text(
-                      'Settings',
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      game.overlays.remove(MainMenu.id);
-                      game.overlays.add(AchievementsView.id);
-                    },
-                    child: const Text(
-                      'Achievements',
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      game.overlays.remove(MainMenu.id);
-                      game.overlays.add(ThemeSelectionMenu.id);
-                    },
-                    child: const Text(
-                      'Themes',
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
+                  _buildMenuButton('Characters', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(CharacterSelectionMenu.id);
+                  }),
+                  _buildMenuButton('Shop', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(ShopMenu.id);
+                  }),
+                  _buildMenuButton('Challenges', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(ChallengesMenu.id);
+                  }),
+                  _buildMenuButton('Themes', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(ThemeSelectionMenu.id);
+                  }),
+                  _buildMenuButton('Stats', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(StatsMenu.id);
+                  }),
+                  _buildMenuButton('Achievements', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(AchievementsView.id);
+                  }),
+                  _buildMenuButton('Settings', () {
+                    game.overlays.remove(MainMenu.id);
+                    game.overlays.add(SettingsMenu.id);
+                  }),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+  
+  Widget _buildMenuButton(String label, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Text(label, style: const TextStyle(fontSize: 30)),
     );
   }
 }
