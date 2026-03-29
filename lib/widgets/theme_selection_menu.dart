@@ -55,10 +55,10 @@ class _ThemeSelectionMenuState extends State<ThemeSelectionMenu> {
                     ),
                   ),
                   Text(
-                    'All Themes Unlocked',
+                    '${_themeManager.unlockedCount}/${_themeManager.totalCount}',
                     style: const TextStyle(
                       fontSize: 18,
-                      color: Colors.green,
+                      color: Colors.white70,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -76,9 +76,11 @@ class _ThemeSelectionMenuState extends State<ThemeSelectionMenu> {
                         theme: theme,
                         isSelected: _selectedTheme == theme,
                         onTap: () {
-                          setState(() {
-                            _selectedTheme = theme;
-                          });
+                          if (theme.unlocked) {
+                            setState(() {
+                              _selectedTheme = theme;
+                            });
+                          }
                         },
                       );
                     }).toList(),
@@ -105,11 +107,11 @@ class _ThemeSelectionMenuState extends State<ThemeSelectionMenu> {
                     child: const Text('Back'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      widget.game.updateTheme(_selectedTheme!);
+                    onPressed: _selectedTheme?.unlocked == true ? () {
+                      _themeManager.switchTheme(_selectedTheme!);
                       widget.game.overlays.remove(ThemeSelectionMenu.id);
                       widget.game.overlays.add('MainMenu');
-                    },
+                    } : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _selectedTheme?.primaryColor ?? const Color(0xFF4ECDC4),
                       foregroundColor: Colors.white,
@@ -143,19 +145,23 @@ class _ThemeTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: InkWell(
-        onTap: onTap,
+        onTap: theme.unlocked ? onTap : null,
         borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             color: isSelected 
                 ? theme.primaryColor.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.2),
+                : theme.unlocked 
+                    ? Colors.grey.withOpacity(0.2)
+                    : Colors.black.withOpacity(0.3),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isSelected 
                   ? theme.primaryColor
-                  : Colors.grey,
+                  : theme.unlocked 
+                      ? Colors.grey
+                      : Colors.red,
               width: isSelected ? 3 : 1,
             ),
           ),
@@ -176,11 +182,17 @@ class _ThemeTile extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                    _getThemeIcon(theme.type),
-                    color: Colors.white,
-                    size: 30,
-                  ),
+                child: theme.unlocked 
+                    ? Icon(
+                        _getThemeIcon(theme.type),
+                        color: Colors.white,
+                        size: 30,
+                      )
+                    : Icon(
+                        Icons.lock,
+                        color: Colors.white70,
+                        size: 30,
+                      ),
               ),
               
               const SizedBox(width: 15),
@@ -192,18 +204,18 @@ class _ThemeTile extends StatelessWidget {
                   children: [
                     Text(
                       theme.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.unlocked ? Colors.white : Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       theme.description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white70,
+                        color: theme.unlocked ? Colors.white70 : Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -213,24 +225,24 @@ class _ThemeTile extends StatelessWidget {
                           '🎯 ${_getThemeFeatures(theme.type)}',
                           style: TextStyle(
                             fontSize: 10,
-                            color: theme.primaryColor,
+                            color: theme.unlocked ? theme.primaryColor : Colors.grey,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          '✨ ${_getThemeEffects(theme.type)}',
+                    if (!theme.unlocked)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Text(
+                          '🔒 Complete achievements to unlock',
                           style: TextStyle(
                             fontSize: 10,
-                            color: theme.secondaryColor,
-                            fontWeight: FontWeight.bold,
+                            color: Colors.red[300],
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ),
@@ -259,18 +271,6 @@ class _ThemeTile extends StatelessWidget {
         return Icons.park;
       case GameThemeType.city:
         return Icons.location_city;
-      case GameThemeType.ocean:
-        return Icons.water;
-      case GameThemeType.space:
-        return Icons.star;
-      case GameThemeType.candy:
-        return Icons.cake;
-      case GameThemeType.winter:
-        return Icons.ac_unit;
-      case GameThemeType.jungle:
-        return Icons.nature;
-      case GameThemeType.volcano:
-        return Icons.local_fire_department;
     }
   }
   
@@ -284,43 +284,6 @@ class _ThemeTile extends StatelessWidget {
         return 'Berries & mushrooms';
       case GameThemeType.city:
         return 'Energy drinks & helmets';
-      case GameThemeType.ocean:
-        return 'Pearls & oxygen tanks';
-      case GameThemeType.space:
-        return 'Star crystals & jetpacks';
-      case GameThemeType.candy:
-        return 'Candy coins & sugar rush';
-      case GameThemeType.winter:
-        return 'Snowflakes & hot chocolate';
-      case GameThemeType.jungle:
-        return 'Exotic fruits & torches';
-      case GameThemeType.volcano:
-        return 'Fire gems & fire shields';
-    }
-  }
-  
-  String _getThemeEffects(GameThemeType type) {
-    switch (type) {
-      case GameThemeType.classic:
-        return 'Retro filter & pixel dust';
-      case GameThemeType.desert:
-        return 'Heat shimmer & mirage';
-      case GameThemeType.forest:
-        return 'Fireflies & falling leaves';
-      case GameThemeType.city:
-        return 'Neon glow & traffic lights';
-      case GameThemeType.ocean:
-        return 'Bubbles & underwater glow';
-      case GameThemeType.space:
-        return 'Starfield & zero gravity';
-      case GameThemeType.candy:
-        return 'Rainbow trail & candy sparkle';
-      case GameThemeType.winter:
-        return 'Aurora lights & ice reflection';
-      case GameThemeType.jungle:
-        return 'Vine swing & ancient glow';
-      case GameThemeType.volcano:
-        return 'Lava glow & ash fall';
     }
   }
 }

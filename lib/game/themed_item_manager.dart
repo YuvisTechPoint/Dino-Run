@@ -90,14 +90,6 @@ class ThemedItemManager extends Component with HasGameReference<DinoRun> {
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for berry
       case GameThemeType.city:
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for energy drink
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        // New themes use placeholder until specific assets are available
-        return game.images.fromCache('DinoSprites - tard.png');
     }
   }
 
@@ -112,14 +104,6 @@ class ThemedItemManager extends Component with HasGameReference<DinoRun> {
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for mushroom
       case GameThemeType.city:
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for helmet
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        // New themes use placeholder until specific assets are available
-        return game.images.fromCache('DinoSprites - tard.png');
     }
   }
 
@@ -133,13 +117,6 @@ class ThemedItemManager extends Component with HasGameReference<DinoRun> {
         return Vector2(18, 18); // Berries are medium
       case GameThemeType.city:
         return Vector2(22, 22); // Energy drinks are largest
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        return Vector2(18, 18); // Default size for new themes
     }
   }
 
@@ -153,13 +130,6 @@ class ThemedItemManager extends Component with HasGameReference<DinoRun> {
         return Vector2(25, 25); // Forest items are medium
       case GameThemeType.city:
         return Vector2(30, 30); // City items are largest
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        return Vector2(25, 25); // Default size for new themes
     }
   }
 
@@ -211,10 +181,5 @@ class ThemedItemManager extends Component with HasGameReference<DinoRun> {
     for (var powerUp in powerUps) {
       powerUp.removeFromParent();
     }
-  }
-  
-  /// Update the theme (public method called from game)
-  void updateTheme(GameTheme newTheme) {
-    // Theme change will be applied on next spawn
   }
 }

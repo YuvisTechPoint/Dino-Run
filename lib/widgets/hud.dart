@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '/game/dino_run.dart';
 import '/game/audio_manager.dart';
 import '/models/player_data.dart';
-import '/models/wallet.dart';
 import '/widgets/pause_menu.dart';
 
 // This represents the head up display in game.
@@ -66,29 +65,6 @@ class Hud extends StatelessWidget {
                   },
                 ),
               ],
-            ),
-            // Coin display
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.amber, width: 1),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
-                  const SizedBox(width: 4),
-                  Text(
-                    game.wallet.formattedCoins,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
             ),
             TextButton(
               onPressed: () {

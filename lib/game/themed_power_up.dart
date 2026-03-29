@@ -149,14 +149,6 @@ class ThemedPowerUp extends SpriteAnimationComponent with HasGameReference<DinoR
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for mushroom
       case GameThemeType.city:
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for helmet
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        // New themes use placeholder until specific assets are available
-        return game.images.fromCache('DinoSprites - tard.png');
     }
   }
 
@@ -238,18 +230,6 @@ class ThemedPowerUp extends SpriteAnimationComponent with HasGameReference<DinoR
           case PowerUpType.invincibility: return 'Helmet';
           case PowerUpType.doubleJump: return 'Jetpack';
           case PowerUpType.speedBoost: return 'Skateboard';
-        }
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        // New themes use default names until specific assets are available
-        switch (type) {
-          case PowerUpType.invincibility: return 'Shield';
-          case PowerUpType.doubleJump: return 'Boost';
-          case PowerUpType.speedBoost: return 'Sprint';
         }
     }
   }

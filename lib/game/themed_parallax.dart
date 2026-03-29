@@ -70,9 +70,4 @@ class ThemedParallax extends Component with HasGameReference<DinoRun> {
   void resetSpeed() {
     // Reset functionality would be implemented with custom parallax system
   }
-  
-  /// Update the theme (public method called from game)
-  void updateTheme(GameTheme newTheme) {
-    _updateParallaxForTheme(newTheme);
-  }
 }

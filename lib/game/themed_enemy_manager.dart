@@ -94,22 +94,7 @@ class ThemedEnemyManager extends Component with HasGameReference<DinoRun> {
       case GameThemeType.city:
         _loadCityEnemies();
         break;
-      case GameThemeType.ocean:
-      case GameThemeType.space:
-      case GameThemeType.candy:
-      case GameThemeType.winter:
-      case GameThemeType.jungle:
-      case GameThemeType.volcano:
-        // For new themes, fall back to classic enemies until specific assets are available
-        _loadClassicEnemies();
-        break;
     }
-  }
-  
-  /// Update the theme (public method called from game)
-  void updateTheme(GameTheme newTheme) {
-    _data.clear();
-    _loadThemeEnemies();
   }
 
   void _loadClassicEnemies() {
