@@ -11,11 +11,14 @@ import '/game/dino.dart';
 import '/widgets/hud.dart';
 import '/models/settings.dart';
 import '/game/audio_manager.dart';
-import '/game/enemy_manager.dart';
+import '/game/themed_enemy_manager.dart';
+import '/game/themed_parallax.dart';
 import '/game/coin_manager.dart';
 import '/game/power_up_manager.dart';
 import '/models/player_data.dart';
 import '/models/achievement.dart';
+import '/models/game_theme.dart';
+import '/managers/theme_manager.dart';
 import '/widgets/pause_menu.dart';
 import '/widgets/game_over_menu.dart';
 import '/widgets/achievement_notification.dart';
@@ -50,12 +53,17 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   late Dino _dino;
   late Settings settings;
   late PlayerData playerData;
-  late EnemyManager _enemyManager;
+  late ThemedEnemyManager _enemyManager;
   late CoinManager _coinManager;
   late PowerUpManager _powerUpManager;
   late AchievementManager _achievementManager;
+  late ThemeManager _themeManager;
+  late ThemedParallax _themedParallax;
 
   Vector2 get virtualSize => camera.viewport.virtualSize;
+  
+  // Make theme manager accessible to other components
+  ThemeManager get themeManager => _themeManager;
 
   // This method get called while flame is preparing this game.
   @override
@@ -68,6 +76,7 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     playerData = await _readPlayerData();
     settings = await _readSettings();
     _achievementManager = AchievementManager();
+    _themeManager = ThemeManager();
 
     /// Initilize [AudioManager].
     await AudioManager.instance.init(_audioAssets, settings);
@@ -82,29 +91,16 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     // This makes the camera look at the center of the viewport.
     camera.viewfinder.position = camera.viewport.virtualSize * 0.5;
 
-    /// Create a [ParallaxComponent] and add it to game.
-    final parallaxBackground = await loadParallaxComponent(
-      [
-        ParallaxImageData('parallax/plx-1.png'),
-        ParallaxImageData('parallax/plx-2.png'),
-        ParallaxImageData('parallax/plx-3.png'),
-        ParallaxImageData('parallax/plx-4.png'),
-        ParallaxImageData('parallax/plx-5.png'),
-        ParallaxImageData('parallax/plx-6.png'),
-      ],
-      baseVelocity: Vector2(10, 0),
-      velocityMultiplierDelta: Vector2(1.4, 0),
-    );
-
-    // Add the parallax as the backdrop.
-    camera.backdrop.add(parallaxBackground);
+    /// Create a [ThemedParallax] and add it to game.
+    _themedParallax = ThemedParallax();
+    world.add(_themedParallax);
   }
 
   /// This method add the already created [Dino]
   /// and [EnemyManager] to this game.
   void startGamePlay() {
     _dino = Dino(images.fromCache('DinoSprites - tard.png'), playerData);
-    _enemyManager = EnemyManager();
+    _enemyManager = ThemedEnemyManager();
     _coinManager = CoinManager();
     _powerUpManager = PowerUpManager();
 
@@ -140,6 +136,9 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   void update(double dt) {
     // Check for achievements
     _achievementManager.checkAchievements(playerData.currentScore);
+    
+    // Unlock themes based on score
+    _themeManager.unlockThemesByScore(playerData.currentScore);
     
     // If number of lives is 0 or less, game is over.
     if (playerData.lives <= 0) {

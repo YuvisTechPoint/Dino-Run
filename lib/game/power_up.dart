@@ -7,6 +7,7 @@ import 'dino.dart';
 import 'dino_run.dart';
 import 'audio_manager.dart';
 import '../models/player_data.dart';
+import 'themed_parallax.dart';
 
 /// Enum for different types of power-ups
 enum PowerUpType {
@@ -85,9 +86,20 @@ class PowerUp extends SpriteAnimationComponent with HasGameReference<DinoRun>, C
   }
   
   void _applySpeedBoost() {
-    // For now, just add bonus points for speed boost
-    // The visual speed effect would require more complex implementation
-    // involving the parallax system which doesn't expose baseVelocity directly
-    playerData.currentScore += 10; // Bonus points for speed boost
+    // Apply speed boost through the themed parallax system
+    final parallaxSystem = game.world.children.whereType<ThemedParallax>().firstOrNull;
+    if (parallaxSystem != null) {
+      parallaxSystem.applySpeedBoost(2.0); // Double speed
+      
+      // Reset after 3 seconds
+      Future.delayed(const Duration(seconds: 3), () {
+        if (parallaxSystem.isMounted) {
+          parallaxSystem.resetSpeed();
+        }
+      });
+    }
+    
+    // Add bonus points for speed boost
+    playerData.currentScore += 10;
   }
 }

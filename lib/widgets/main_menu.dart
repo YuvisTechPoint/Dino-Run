@@ -6,6 +6,7 @@ import '/widgets/hud.dart';
 import '/game/dino_run.dart';
 import '/widgets/settings_menu.dart';
 import '/widgets/achievements_view.dart';
+import '/widgets/theme_selection_menu.dart';
 
 // This represents the main menu overlay.
 class MainMenu extends StatelessWidget {
@@ -68,6 +69,16 @@ class MainMenu extends StatelessWidget {
                     },
                     child: const Text(
                       'Achievements',
+                      style: TextStyle(fontSize: 30),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      game.overlays.remove(MainMenu.id);
+                      game.overlays.add(ThemeSelectionMenu.id);
+                    },
+                    child: const Text(
+                      'Themes',
                       style: TextStyle(fontSize: 30),
                     ),
                   ),

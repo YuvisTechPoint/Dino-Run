@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 part 'achievement.g.dart';
 
 /// Represents an achievement in the game.
-@HiveType(typeId: 1)
+@HiveType(typeId: 2)
 class Achievement extends ChangeNotifier with HiveObjectMixin {
   @HiveField(0)
   final String id;

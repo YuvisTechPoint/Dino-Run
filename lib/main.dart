@@ -11,10 +11,12 @@ import 'models/settings.dart';
 import 'widgets/main_menu.dart';
 import 'models/player_data.dart';
 import 'models/achievement.dart';
+import 'models/game_theme.dart';
 import 'widgets/pause_menu.dart';
 import 'widgets/settings_menu.dart';
 import 'widgets/game_over_menu.dart';
 import 'widgets/achievements_view.dart';
+import 'widgets/theme_selection_menu.dart';
 
 Future<void> main() async {
   // Ensures that all bindings are initialized
@@ -39,6 +41,7 @@ Future<void> initHive() async {
   Hive.registerAdapter<PlayerData>(PlayerDataAdapter());
   Hive.registerAdapter<Settings>(SettingsAdapter());
   Hive.registerAdapter<Achievement>(AchievementAdapter());
+  Hive.registerAdapter<GameTheme>(GameThemeAdapter());
 }
 
 // The main widget for this game.
@@ -77,6 +80,7 @@ class DinoRunApp extends StatelessWidget {
             GameOverMenu.id: (_, game) => GameOverMenu(game),
             SettingsMenu.id: (_, game) => SettingsMenu(game),
             AchievementsView.id: (_, game) => AchievementsView(game),
+            ThemeSelectionMenu.id: (_, game) => ThemeSelectionMenu(game),
           },
           // By default MainMenu overlay will be active.
           initialActiveOverlays: const [MainMenu.id],
