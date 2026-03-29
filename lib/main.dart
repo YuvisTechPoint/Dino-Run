@@ -54,8 +54,8 @@ Future<void> initHive() async {
   // TODO: Generate Hive adapters for new models
   // Hive.registerAdapter<Wallet>(WalletAdapter());
   // Hive.registerAdapter<ShopItem>(ShopItemAdapter());
-  Hive.registerAdapter<DailyChallenge>(DailyChallengeAdapter());
-  Hive.registerAdapter<Character>(CharacterAdapter());
+  // Hive.registerAdapter<DailyChallenge>(DailyChallengeAdapter());
+  // Hive.registerAdapter<Character>(CharacterAdapter());
   // Hive.registerAdapter<PlayerStats>(PlayerStatsAdapter());
 }
 

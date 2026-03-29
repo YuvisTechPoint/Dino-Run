@@ -476,6 +476,7 @@ class EffectsManager {
           (i * 80) % screenSize.x,
           0,
         ),
+        size: Vector2(5, 100 + (i % 50)),
         length: 100 + (i % 50),
         swayAmount: 15 + (i % 10),
         swaySpeed: 0.8 + (i % 5) * 0.2,
