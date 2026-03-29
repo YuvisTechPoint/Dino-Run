@@ -12,9 +12,13 @@ import '/widgets/hud.dart';
 import '/models/settings.dart';
 import '/game/audio_manager.dart';
 import '/game/enemy_manager.dart';
+import '/game/coin_manager.dart';
+import '/game/power_up_manager.dart';
 import '/models/player_data.dart';
+import '/models/achievement.dart';
 import '/widgets/pause_menu.dart';
 import '/widgets/game_over_menu.dart';
+import '/widgets/achievement_notification.dart';
 
 // This is the main flame game class.
 class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
@@ -39,12 +43,17 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     '8BitPlatformerLoop.wav',
     'hurt7.wav',
     'jump14.wav',
+    'coin.wav',
+    'powerup.wav',
   ];
 
   late Dino _dino;
   late Settings settings;
   late PlayerData playerData;
   late EnemyManager _enemyManager;
+  late CoinManager _coinManager;
+  late PowerUpManager _powerUpManager;
+  late AchievementManager _achievementManager;
 
   Vector2 get virtualSize => camera.viewport.virtualSize;
 
@@ -58,6 +67,7 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     /// Read [PlayerData] and [Settings] from hive.
     playerData = await _readPlayerData();
     settings = await _readSettings();
+    _achievementManager = AchievementManager();
 
     /// Initilize [AudioManager].
     await AudioManager.instance.init(_audioAssets, settings);
@@ -95,9 +105,13 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   void startGamePlay() {
     _dino = Dino(images.fromCache('DinoSprites - tard.png'), playerData);
     _enemyManager = EnemyManager();
+    _coinManager = CoinManager();
+    _powerUpManager = PowerUpManager();
 
     world.add(_dino);
     world.add(_enemyManager);
+    world.add(_coinManager);
+    world.add(_powerUpManager);
   }
 
   // This method remove all the actors from the game.
@@ -105,6 +119,10 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     _dino.removeFromParent();
     _enemyManager.removeAllEnemies();
     _enemyManager.removeFromParent();
+    _coinManager.removeAllCoins();
+    _coinManager.removeFromParent();
+    _powerUpManager.removeAllPowerUps();
+    _powerUpManager.removeFromParent();
   }
 
   // This method reset the whole game world to initial state.
@@ -120,6 +138,9 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   // This method gets called for each tick/frame of the game.
   @override
   void update(double dt) {
+    // Check for achievements
+    _achievementManager.checkAchievements(playerData.currentScore);
+    
     // If number of lives is 0 or less, game is over.
     if (playerData.lives <= 0) {
       overlays.add(GameOverMenu.id);

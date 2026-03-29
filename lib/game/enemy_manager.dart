@@ -16,7 +16,13 @@ class EnemyManager extends Component with HasGameReference<DinoRun> {
   final Random _random = Random();
 
   // Timer to decide when to spawn next enemy.
-  final Timer _timer = Timer(2, repeat: true);
+  Timer _timer = Timer(2, repeat: true);
+
+  // Base spawn rate that will increase with difficulty
+  double _baseSpawnRate = 2.0;
+  
+  // Score threshold for difficulty increase
+  int _lastDifficultyScore = 0;
 
   EnemyManager() {
     _timer.onTick = spawnRandomEnemy;
@@ -27,7 +33,19 @@ class EnemyManager extends Component with HasGameReference<DinoRun> {
     /// Generate a random index within [_data] and get an [EnemyData].
     final randomIndex = _random.nextInt(_data.length);
     final enemyData = _data.elementAt(randomIndex);
-    final enemy = Enemy(enemyData);
+    
+    // Apply difficulty multiplier to enemy speed
+    final difficultyMultiplier = _getDifficultyMultiplier();
+    final modifiedEnemyData = EnemyData(
+      image: enemyData.image,
+      nFrames: enemyData.nFrames,
+      stepTime: enemyData.stepTime,
+      textureSize: enemyData.textureSize,
+      speedX: enemyData.speedX * difficultyMultiplier,
+      canFly: enemyData.canFly,
+    );
+    
+    final enemy = Enemy(modifiedEnemyData);
 
     // Help in setting all enemies on ground.
     enemy.anchor = Anchor.bottomLeft;
@@ -87,8 +105,38 @@ class EnemyManager extends Component with HasGameReference<DinoRun> {
 
   @override
   void update(double dt) {
+    _updateDifficulty();
     _timer.update(dt);
     super.update(dt);
+  }
+  
+  // Update difficulty based on current score
+  void _updateDifficulty() {
+    final currentScore = game.playerData.currentScore;
+    
+    // Increase difficulty every 100 points
+    if (currentScore >= _lastDifficultyScore + 100) {
+      _lastDifficultyScore = (currentScore ~/ 100) * 100;
+      _increaseDifficulty();
+    }
+  }
+  
+  // Increase difficulty by reducing spawn rate and increasing enemy speed
+  void _increaseDifficulty() {
+    // Reduce spawn rate (make enemies spawn more frequently)
+    _baseSpawnRate = (_baseSpawnRate * 0.9).clamp(0.5, 2.0);
+    
+    // Update timer with new spawn rate
+    _timer.stop();
+    _timer = Timer(_baseSpawnRate, repeat: true);
+    _timer.onTick = spawnRandomEnemy;
+    _timer.start();
+  }
+  
+  // Get difficulty multiplier based on score
+  double _getDifficultyMultiplier() {
+    final scoreMultiplier = 1.0 + (game.playerData.currentScore / 500.0);
+    return scoreMultiplier.clamp(1.0, 3.0); // Max 3x speed
   }
 
   void removeAllEnemies() {

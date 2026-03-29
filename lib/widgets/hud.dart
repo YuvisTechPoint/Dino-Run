@@ -48,6 +48,22 @@ class Hud extends StatelessWidget {
                     );
                   },
                 ),
+                Selector<PlayerData, int>(
+                  selector: (_, playerData) => playerData.comboCount,
+                  builder: (_, combo, __) {
+                    if (combo > 1) {
+                      return Text(
+                        'Combo x$combo',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.yellow,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
               ],
             ),
             TextButton(

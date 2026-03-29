@@ -23,13 +23,40 @@ class PlayerData extends ChangeNotifier with HiveObjectMixin {
 
   int get currentScore => _currentScore;
   set currentScore(int value) {
+    final previousScore = _currentScore;
     _currentScore = value;
 
     if (highScore < _currentScore) {
       highScore = _currentScore;
     }
 
+    // Check for new achievements
+    if (value > previousScore) {
+      _checkScoreAchievements(value);
+    }
+
     notifyListeners();
     save();
+  }
+  
+  // Combo tracking
+  int _comboCount = 0;
+  
+  int get comboCount => _comboCount;
+  
+  void incrementCombo() {
+    _comboCount++;
+    notifyListeners();
+  }
+  
+  void resetCombo() {
+    _comboCount = 0;
+    notifyListeners();
+  }
+  
+  // Check for score-based achievements
+  void _checkScoreAchievements(int score) {
+    // This will be handled by AchievementManager
+    // Keeping the method here for potential future use
   }
 }
