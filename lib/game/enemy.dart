@@ -47,6 +47,14 @@ class Enemy extends SpriteAnimationComponent
     if (position.x < -enemyData.textureSize.x) {
       removeFromParent();
       game.playerData.currentScore += 1;
+      
+      // Increment combo for successful dodge
+      game.playerData.incrementCombo();
+      
+      // Add bonus points for combo
+      if (game.playerData.comboCount > 1) {
+        game.playerData.currentScore += game.playerData.comboCount - 1;
+      }
     }
 
     super.update(dt);

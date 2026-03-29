@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/parallax.dart';
 
 import 'dino.dart';
 import 'dino_run.dart';
@@ -62,19 +63,31 @@ class PowerUp extends SpriteAnimationComponent with HasGameReference<DinoRun>, C
   }
 
   void _applyPowerUpEffect() {
+    // Find the dino in the game world
+    final dino = game.world.children.whereType<Dino>().firstOrNull;
+    if (dino == null) return;
+    
     switch (type) {
       case PowerUpType.invincibility:
         // Make dino invincible for 5 seconds
-        // This would need to be implemented in the Dino class
+        dino.makeInvincible(5.0);
         break;
       case PowerUpType.doubleJump:
-        // Enable double jump for the rest of the game session
-        // This would need to be implemented in the Dino class
+        // Enable double jump permanently
+        dino.enableDoubleJump();
         break;
       case PowerUpType.speedBoost:
         // Increase game speed temporarily
-        // This would need to be implemented in the game manager
+        // This would be implemented in the game manager
+        _applySpeedBoost();
         break;
     }
+  }
+  
+  void _applySpeedBoost() {
+    // For now, just add bonus points for speed boost
+    // The visual speed effect would require more complex implementation
+    // involving the parallax system which doesn't expose baseVelocity directly
+    playerData.currentScore += 10; // Bonus points for speed boost
   }
 }

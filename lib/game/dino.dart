@@ -53,6 +53,15 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
 
   // Dino's current speed along y-axis.
   double speedY = 0.0;
+  
+  // Jump mechanics
+  int _jumpCount = 0;
+  int _maxJumps = 1; // Can be increased by power-ups
+  bool _hasDoubleJump = false;
+  
+  // Invincibility mechanics
+  bool _isInvincible = false;
+  final Timer _invincibilityTimer = Timer(5.0); // 5 seconds of invincibility
 
   // Controlls how long the hit animations will be played.
   final Timer _hitTimer = Timer(1);
@@ -87,6 +96,11 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
       current = DinoAnimationStates.run;
       isHit = false;
     };
+    
+    /// Set the callback for [_invincibilityTimer].
+    _invincibilityTimer.onTick = () {
+      _isInvincible = false;
+    };
 
     super.onMount();
   }
@@ -103,6 +117,7 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
     if (isOnGround) {
       y = yMax;
       speedY = 0.0;
+      _jumpCount = 0; // Reset jump count when landing
       if ((current != DinoAnimationStates.hit) &&
           (current != DinoAnimationStates.run)) {
         current = DinoAnimationStates.run;
@@ -110,6 +125,7 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
     }
 
     _hitTimer.update(dt);
+    _invincibilityTimer.update(dt);
     super.update(dt);
   }
 
@@ -117,8 +133,8 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     // Call hit only if other component is an Enemy and dino
-    // is not already in hit state.
-    if ((other is Enemy) && (!isHit)) {
+    // is not already in hit state and not invincible
+    if ((other is Enemy) && (!isHit) && (!_isInvincible)) {
       hit();
     }
     super.onCollision(intersectionPoints, other);
@@ -129,11 +145,18 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
 
   // Makes the dino jump.
   void jump() {
-    // Jump only if dino is on ground.
+    // Jump only if dino is on ground or has double jump available
     if (isOnGround) {
       speedY = -300;
       current = DinoAnimationStates.idle;
       AudioManager.instance.playSfx('jump14.wav');
+      _jumpCount = 1;
+    } else if (_hasDoubleJump && _jumpCount < _maxJumps) {
+      // Double jump
+      speedY = -250; // Slightly lower jump for double jump
+      current = DinoAnimationStates.kick; // Use kick animation for double jump
+      AudioManager.instance.playSfx('jump14.wav');
+      _jumpCount++;
     }
   }
 
@@ -146,6 +169,9 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
     current = DinoAnimationStates.hit;
     _hitTimer.start();
     playerData.lives -= 1;
+    
+    // Reset combo when hit
+    playerData.resetCombo();
   }
 
   // This method reset some of the important properties
@@ -160,5 +186,29 @@ class Dino extends SpriteAnimationGroupComponent<DinoAnimationStates>
     current = DinoAnimationStates.run;
     isHit = false;
     speedY = 0.0;
+    _jumpCount = 0;
+    _hasDoubleJump = false;
+    _maxJumps = 1;
+    _isInvincible = false;
+    _invincibilityTimer.stop();
+  }
+  
+  // Enable double jump power-up
+  void enableDoubleJump() {
+    _hasDoubleJump = true;
+    _maxJumps = 2;
+  }
+  
+  // Check if dino can double jump
+  bool get canDoubleJump => _hasDoubleJump && _jumpCount < _maxJumps && !isOnGround;
+  
+  // Check if dino is invincible
+  bool get isInvincible => _isInvincible;
+  
+  // Make dino invincible for a duration
+  void makeInvincible(double duration) {
+    _isInvincible = true;
+    _invincibilityTimer.limit = duration;
+    _invincibilityTimer.start();
   }
 }
