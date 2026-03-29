@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-part 'wallet.g.dart';
-
 /// Represents different types of coins with their values
 enum CoinType {
   bronze(1),
@@ -15,7 +13,7 @@ enum CoinType {
 }
 
 /// Manages player's currency (coins and gems)
-@HiveType(typeId: 4)
+// TODO: Generate Hive adapter with: flutter packages pub run build_runner build
 class Wallet extends ChangeNotifier with HiveObjectMixin {
   @HiveField(0)
   int _coins = 0;

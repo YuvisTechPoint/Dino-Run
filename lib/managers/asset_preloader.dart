@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flame/assets.dart';
+import 'package:flame/flame.dart';
 
 import '../models/game_theme.dart';
 import 'theme_manager.dart';
@@ -17,7 +17,7 @@ class AssetPreloader {
   bool _isPreloaded = false;
 
   /// Preload all theme assets for instant access
-  Future<void> preloadAllAssets(Images images) async {
+  Future<void> preloadAllAssets(dynamic images) async {
     if (_isPreloaded || _isPreloading) return;
     
     _isPreloading = true;
@@ -40,7 +40,7 @@ class AssetPreloader {
   }
 
   /// Preload assets for a specific theme
-  Future<void> _preloadThemeAssets(GameTheme theme, Images images) async {
+  Future<void> _preloadThemeAssets(GameTheme theme, dynamic images) async {
     // Preload parallax layers
     for (final layerPath in theme.parallaxLayers) {
       try {
@@ -144,7 +144,7 @@ class AssetPreloader {
   }
 
   /// Preload specific theme on demand
-  Future<void> preloadTheme(GameTheme theme, Images images) async {
+  Future<void> preloadTheme(GameTheme theme, dynamic images) async {
     if (_preloadedImages.containsKey(theme.groundTexture)) {
       return; // Already preloaded
     }

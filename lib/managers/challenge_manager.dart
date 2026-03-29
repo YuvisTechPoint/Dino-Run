@@ -37,10 +37,10 @@ class ChallengeManager extends ChangeNotifier {
   Future<void> _loadChallenges() async {
     try {
       final box = await Hive.openBox<DailyChallenge>(_challengesBoxName);
-      final lastGenBox = await Hive.openBox<DateTime>('${_challengesBoxName}_meta');
+      final metaBox = await Hive.openBox<dynamic>('${_challengesBoxName}_meta');
       
-      _lastGenerated = lastGenBox.get(_lastGeneratedKey);
-      _streak = lastGenBox.get(_streakKey) ?? 0;
+      _lastGenerated = metaBox.get(_lastGeneratedKey) as DateTime?;
+      _streak = (metaBox.get(_streakKey) as int?) ?? 0;
       
       // Load valid challenges only
       _challenges = box.values.where((c) => c.isValid).toList();
@@ -55,7 +55,7 @@ class ChallengeManager extends ChangeNotifier {
   Future<void> _saveChallenges() async {
     try {
       final box = await Hive.openBox<DailyChallenge>(_challengesBoxName);
-      final metaBox = await Hive.openBox<DateTime>('${_challengesBoxName}_meta');
+      final metaBox = await Hive.openBox<dynamic>('${_challengesBoxName}_meta');
       
       await box.clear();
       for (final challenge in _challenges) {
@@ -63,7 +63,7 @@ class ChallengeManager extends ChangeNotifier {
       }
       
       if (_lastGenerated != null) {
-        await metaBox.put(_lastGeneratedKey, _lastGenerated!);
+        await metaBox.put(_lastGeneratedKey, _lastGenerated);
       }
       await metaBox.put(_streakKey, _streak);
     } catch (e) {

@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-part 'daily_challenge.g.dart';
+// TODO: Generate Hive adapter with: flutter packages pub run build_runner build
+// part 'daily_challenge.g.dart';
 
 /// Enum for different challenge types
 enum ChallengeType {

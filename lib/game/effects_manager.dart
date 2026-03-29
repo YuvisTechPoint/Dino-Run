@@ -518,17 +518,16 @@ class EffectsManager {
 
 // Individual Effect Component Classes
 class SnowflakeComponent extends PositionComponent {
-  final Vector2 size;
   final double fallSpeed;
   final double swayAmount;
   double _time = 0;
 
   SnowflakeComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.fallSpeed,
     required this.swayAmount,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -546,14 +545,13 @@ class SnowflakeComponent extends PositionComponent {
 }
 
 class RaindropComponent extends PositionComponent {
-  final Vector2 size;
   final double fallSpeed;
 
   RaindropComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.fallSpeed,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -569,16 +567,15 @@ class RaindropComponent extends PositionComponent {
 }
 
 class SandParticleComponent extends PositionComponent {
-  final Vector2 size;
   final double moveSpeed;
   final Vector2 direction;
 
   SandParticleComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.moveSpeed,
     required this.direction,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -594,17 +591,16 @@ class SandParticleComponent extends PositionComponent {
 }
 
 class AshParticleComponent extends PositionComponent {
-  final Vector2 size;
   final double fallSpeed;
   final double swayAmount;
   double _time = 0;
 
   AshParticleComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.fallSpeed,
     required this.swayAmount,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -622,19 +618,18 @@ class AshParticleComponent extends PositionComponent {
 }
 
 class CandyRainComponent extends PositionComponent {
-  final Vector2 size;
   final double fallSpeed;
   final double rotationSpeed;
   final int candyType;
   double _rotation = 0;
 
   CandyRainComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.fallSpeed,
     required this.rotationSpeed,
     required this.candyType,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -661,16 +656,15 @@ class CandyRainComponent extends PositionComponent {
 }
 
 class MeteorComponent extends PositionComponent {
-  final Vector2 size;
   final double fallSpeed;
   final double trailLength;
 
   MeteorComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.fallSpeed,
     required this.trailLength,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -696,17 +690,16 @@ class MeteorComponent extends PositionComponent {
 }
 
 class BubbleComponent extends PositionComponent {
-  final Vector2 size;
   final double riseSpeed;
   final double swayAmount;
   double _time = 0;
 
   BubbleComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.riseSpeed,
     required this.swayAmount,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -727,17 +720,16 @@ class BubbleComponent extends PositionComponent {
 }
 
 class MistComponent extends PositionComponent {
-  final Vector2 size;
   final double opacity;
   final double driftSpeed;
   double _time = 0;
 
   MistComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.opacity,
     required this.driftSpeed,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -754,19 +746,18 @@ class MistComponent extends PositionComponent {
 }
 
 class LeafComponent extends PositionComponent {
-  final Vector2 size;
   final double moveSpeed;
   final double swayAmount;
   final int leafType;
   double _time = 0;
 
   LeafComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.moveSpeed,
     required this.swayAmount,
     required this.leafType,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -893,15 +884,14 @@ class LavaGlowComponent extends Component {
 
 // Additional effect components (simplified implementations)
 class PixelDustComponent extends PositionComponent {
-  final Vector2 size;
   final double flickerSpeed;
   double _time = 0;
 
   PixelDustComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.flickerSpeed,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -918,14 +908,13 @@ class PixelDustComponent extends PositionComponent {
 }
 
 class MirageComponent extends PositionComponent {
-  final Vector2 size;
   final double opacity;
 
   MirageComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.opacity,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -935,17 +924,16 @@ class MirageComponent extends PositionComponent {
 }
 
 class FireflyComponent extends PositionComponent {
-  final Vector2 size;
   final double glowIntensity;
   final int movePattern;
   double _time = 0;
 
   FireflyComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.glowIntensity,
     required this.movePattern,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -964,19 +952,18 @@ class FireflyComponent extends PositionComponent {
 }
 
 class FallingLeafComponent extends PositionComponent {
-  final Vector2 size;
   final double fallSpeed;
   final double rotationSpeed;
   final int leafColor;
   double _rotation = 0;
 
   FallingLeafComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.fallSpeed,
     required this.rotationSpeed,
     required this.leafColor,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -1004,17 +991,16 @@ class FallingLeafComponent extends PositionComponent {
 }
 
 class TrafficLightComponent extends PositionComponent {
-  final Vector2 size;
   final int lightType;
   final double blinkSpeed;
   double _time = 0;
 
   TrafficLightComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.lightType,
     required this.blinkSpeed,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -1036,17 +1022,16 @@ class TrafficLightComponent extends PositionComponent {
 }
 
 class StarComponent extends PositionComponent {
-  final Vector2 size;
   final double twinkleSpeed;
   final double brightness;
   double _time = 0;
 
   StarComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.twinkleSpeed,
     required this.brightness,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -1063,17 +1048,16 @@ class StarComponent extends PositionComponent {
 }
 
 class CandySparkleComponent extends PositionComponent {
-  final Vector2 size;
   final int sparkleColor;
   final double sparkleSpeed;
   double _time = 0;
 
   CandySparkleComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.sparkleColor,
     required this.sparkleSpeed,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -1098,19 +1082,18 @@ class CandySparkleComponent extends PositionComponent {
 }
 
 class AuroraComponent extends PositionComponent {
-  final Vector2 size;
   final double waveAmplitude;
   final double waveSpeed;
   final int auroraColor;
   double _time = 0;
 
   AuroraComponent({
-    required super.position,
-    required this.size,
+    required Vector2 position,
+    required Vector2 size,
     required this.waveAmplitude,
     required this.waveSpeed,
     required this.auroraColor,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {
@@ -1138,11 +1121,12 @@ class VineComponent extends PositionComponent {
   double _time = 0;
 
   VineComponent({
-    required super.position,
+    required Vector2 position,
+    required Vector2 size,
     required this.length,
     required this.swayAmount,
     required this.swaySpeed,
-  });
+  }) : super(position: position, size: size);
 
   @override
   void render(Canvas canvas) {

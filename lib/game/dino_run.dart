@@ -87,7 +87,6 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   EffectsManager get effectsManager => _effectsManager;
   AssetPreloader get assetPreloader => _assetPreloader;
   CharacterManager get characterManager => _characterManager;
-  Wallet get wallet => _wallet;
 
   // This method get called while flame is preparing this game.
   @override
