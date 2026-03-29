@@ -184,7 +184,7 @@ class _ThemeTile extends StatelessWidget {
                 ),
                 child: theme.unlocked 
                     ? Icon(
-                        Icons.palette,
+                        _getThemeIcon(theme.type),
                         color: Colors.white,
                         size: 30,
                       )
@@ -218,6 +218,19 @@ class _ThemeTile extends StatelessWidget {
                         color: theme.unlocked ? Colors.white70 : Colors.grey,
                       ),
                     ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Text(
+                          '🎯 ${_getThemeFeatures(theme.type)}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: theme.unlocked ? theme.primaryColor : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                     if (!theme.unlocked)
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
@@ -246,5 +259,31 @@ class _ThemeTile extends StatelessWidget {
         ),
       ),
     );
+  }
+  
+  IconData _getThemeIcon(GameThemeType type) {
+    switch (type) {
+      case GameThemeType.classic:
+        return Icons.pets;
+      case GameThemeType.desert:
+        return Icons.wb_sunny;
+      case GameThemeType.forest:
+        return Icons.park;
+      case GameThemeType.city:
+        return Icons.location_city;
+    }
+  }
+  
+  String _getThemeFeatures(GameThemeType type) {
+    switch (type) {
+      case GameThemeType.classic:
+        return 'Classic enemies & coins';
+      case GameThemeType.desert:
+        return 'Water drops & canteens';
+      case GameThemeType.forest:
+        return 'Berries & mushrooms';
+      case GameThemeType.city:
+        return 'Energy drinks & helmets';
+    }
   }
 }

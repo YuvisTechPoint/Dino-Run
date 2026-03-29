@@ -13,8 +13,8 @@ import '/models/settings.dart';
 import '/game/audio_manager.dart';
 import '/game/themed_enemy_manager.dart';
 import '/game/themed_parallax.dart';
-import '/game/coin_manager.dart';
-import '/game/power_up_manager.dart';
+import '/game/themed_item_manager.dart';
+import '/game/themed_ground.dart';
 import '/models/player_data.dart';
 import '/models/achievement.dart';
 import '/models/game_theme.dart';
@@ -54,8 +54,8 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   late Settings settings;
   late PlayerData playerData;
   late ThemedEnemyManager _enemyManager;
-  late CoinManager _coinManager;
-  late PowerUpManager _powerUpManager;
+  late ThemedItemManager _itemManager;
+  late ThemedGround _themedGround;
   late AchievementManager _achievementManager;
   late ThemeManager _themeManager;
   late ThemedParallax _themedParallax;
@@ -94,6 +94,10 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     /// Create a [ThemedParallax] and add it to game.
     _themedParallax = ThemedParallax();
     world.add(_themedParallax);
+    
+    /// Create a [ThemedGround] and add it to game.
+    _themedGround = ThemedGround();
+    world.add(_themedGround);
   }
 
   /// This method add the already created [Dino]
@@ -101,13 +105,11 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
   void startGamePlay() {
     _dino = Dino(images.fromCache('DinoSprites - tard.png'), playerData);
     _enemyManager = ThemedEnemyManager();
-    _coinManager = CoinManager();
-    _powerUpManager = PowerUpManager();
+    _itemManager = ThemedItemManager();
 
     world.add(_dino);
     world.add(_enemyManager);
-    world.add(_coinManager);
-    world.add(_powerUpManager);
+    world.add(_itemManager);
   }
 
   // This method remove all the actors from the game.
@@ -115,10 +117,8 @@ class DinoRun extends FlameGame with TapDetector, HasCollisionDetection {
     _dino.removeFromParent();
     _enemyManager.removeAllEnemies();
     _enemyManager.removeFromParent();
-    _coinManager.removeAllCoins();
-    _coinManager.removeFromParent();
-    _powerUpManager.removeAllPowerUps();
-    _powerUpManager.removeFromParent();
+    _itemManager.removeAllItems();
+    _itemManager.removeFromParent();
   }
 
   // This method reset the whole game world to initial state.
