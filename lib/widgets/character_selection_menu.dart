@@ -20,7 +20,7 @@ class _CharacterSelectionMenuState extends State<CharacterSelectionMenu> {
   @override
   void initState() {
     super.initState();
-    _characterManager = widget.game._characterManager;
+    _characterManager = widget.game.characterManager;
     _characterManager.addListener(() {
       setState(() {});
     });

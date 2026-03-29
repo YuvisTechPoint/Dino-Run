@@ -95,6 +95,14 @@ class ThemedCoin extends SpriteAnimationComponent with HasGameReference<DinoRun>
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for berry
       case GameThemeType.city:
         return game.images.fromCache('DinoSprites - tard.png'); // Placeholder for energy drink
+      case GameThemeType.ocean:
+      case GameThemeType.space:
+      case GameThemeType.candy:
+      case GameThemeType.winter:
+      case GameThemeType.jungle:
+      case GameThemeType.volcano:
+        // New themes use placeholder until specific assets are available
+        return game.images.fromCache('DinoSprites - tard.png');
     }
   }
 
@@ -123,6 +131,13 @@ class ThemedCoin extends SpriteAnimationComponent with HasGameReference<DinoRun>
         return 12; // Berries have moderate value
       case GameThemeType.city:
         return 20; // Energy drinks are most valuable
+      case GameThemeType.ocean:
+      case GameThemeType.space:
+      case GameThemeType.candy:
+      case GameThemeType.winter:
+      case GameThemeType.jungle:
+      case GameThemeType.volcano:
+        return 12; // Default value for new themes
     }
   }
 
@@ -137,6 +152,18 @@ class ThemedCoin extends SpriteAnimationComponent with HasGameReference<DinoRun>
         return 'Berry';
       case GameThemeType.city:
         return 'Energy Drink';
+      case GameThemeType.ocean:
+        return 'Pearl';
+      case GameThemeType.space:
+        return 'Star Crystal';
+      case GameThemeType.candy:
+        return 'Candy';
+      case GameThemeType.winter:
+        return 'Snowflake';
+      case GameThemeType.jungle:
+        return 'Exotic Fruit';
+      case GameThemeType.volcano:
+        return 'Fire Gem';
     }
   }
 }

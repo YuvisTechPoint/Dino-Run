@@ -1,4 +1,8 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 part 'daily_challenge.g.dart';

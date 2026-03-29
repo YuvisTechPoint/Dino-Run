@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flame/assets.dart';
+
 import '../models/game_theme.dart';
 import 'theme_manager.dart';
 

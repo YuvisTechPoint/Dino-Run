@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import '../models/daily_challenge.dart';
 import '../models/wallet.dart';
 

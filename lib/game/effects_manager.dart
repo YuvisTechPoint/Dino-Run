@@ -1,6 +1,10 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+
 import '../models/game_theme.dart';
 
 /// Manages visual effects for different themes
@@ -427,7 +431,7 @@ class EffectsManager {
   Component _createRainbowTrailEffect() {
     return RainbowTrailComponent();
   }
-
+  
   List<Component> _createCandySparkleEffect(Vector2 screenSize) {
     final sparkles = <Component>[];
     for (int i = 0; i < 35; i++) {
@@ -513,7 +517,7 @@ class EffectsManager {
 }
 
 // Individual Effect Component Classes
-class SnowflakeComponent extends Component {
+class SnowflakeComponent extends PositionComponent {
   final Vector2 size;
   final double fallSpeed;
   final double swayAmount;
@@ -541,7 +545,7 @@ class SnowflakeComponent extends Component {
   }
 }
 
-class RaindropComponent extends Component {
+class RaindropComponent extends PositionComponent {
   final Vector2 size;
   final double fallSpeed;
 
@@ -564,7 +568,7 @@ class RaindropComponent extends Component {
   }
 }
 
-class SandParticleComponent extends Component {
+class SandParticleComponent extends PositionComponent {
   final Vector2 size;
   final double moveSpeed;
   final Vector2 direction;
@@ -589,7 +593,7 @@ class SandParticleComponent extends Component {
   }
 }
 
-class AshParticleComponent extends Component {
+class AshParticleComponent extends PositionComponent {
   final Vector2 size;
   final double fallSpeed;
   final double swayAmount;
@@ -617,7 +621,7 @@ class AshParticleComponent extends Component {
   }
 }
 
-class CandyRainComponent extends Component {
+class CandyRainComponent extends PositionComponent {
   final Vector2 size;
   final double fallSpeed;
   final double rotationSpeed;
@@ -656,7 +660,7 @@ class CandyRainComponent extends Component {
   }
 }
 
-class MeteorComponent extends Component {
+class MeteorComponent extends PositionComponent {
   final Vector2 size;
   final double fallSpeed;
   final double trailLength;
@@ -691,7 +695,7 @@ class MeteorComponent extends Component {
   }
 }
 
-class BubbleComponent extends Component {
+class BubbleComponent extends PositionComponent {
   final Vector2 size;
   final double riseSpeed;
   final double swayAmount;
@@ -722,7 +726,7 @@ class BubbleComponent extends Component {
   }
 }
 
-class MistComponent extends Component {
+class MistComponent extends PositionComponent {
   final Vector2 size;
   final double opacity;
   final double driftSpeed;
@@ -749,7 +753,7 @@ class MistComponent extends Component {
   }
 }
 
-class LeafComponent extends Component {
+class LeafComponent extends PositionComponent {
   final Vector2 size;
   final double moveSpeed;
   final double swayAmount;
@@ -888,7 +892,7 @@ class LavaGlowComponent extends Component {
 }
 
 // Additional effect components (simplified implementations)
-class PixelDustComponent extends Component {
+class PixelDustComponent extends PositionComponent {
   final Vector2 size;
   final double flickerSpeed;
   double _time = 0;
@@ -913,7 +917,7 @@ class PixelDustComponent extends Component {
   }
 }
 
-class MirageComponent extends Component {
+class MirageComponent extends PositionComponent {
   final Vector2 size;
   final double opacity;
 
@@ -930,7 +934,7 @@ class MirageComponent extends Component {
   }
 }
 
-class FireflyComponent extends Component {
+class FireflyComponent extends PositionComponent {
   final Vector2 size;
   final double glowIntensity;
   final int movePattern;
@@ -959,7 +963,7 @@ class FireflyComponent extends Component {
   }
 }
 
-class FallingLeafComponent extends Component {
+class FallingLeafComponent extends PositionComponent {
   final Vector2 size;
   final double fallSpeed;
   final double rotationSpeed;
@@ -999,7 +1003,7 @@ class FallingLeafComponent extends Component {
   }
 }
 
-class TrafficLightComponent extends Component {
+class TrafficLightComponent extends PositionComponent {
   final Vector2 size;
   final int lightType;
   final double blinkSpeed;
@@ -1031,7 +1035,7 @@ class TrafficLightComponent extends Component {
   }
 }
 
-class StarComponent extends Component {
+class StarComponent extends PositionComponent {
   final Vector2 size;
   final double twinkleSpeed;
   final double brightness;
@@ -1058,7 +1062,7 @@ class StarComponent extends Component {
   }
 }
 
-class CandySparkleComponent extends Component {
+class CandySparkleComponent extends PositionComponent {
   final Vector2 size;
   final int sparkleColor;
   final double sparkleSpeed;
@@ -1093,7 +1097,7 @@ class CandySparkleComponent extends Component {
   }
 }
 
-class AuroraComponent extends Component {
+class AuroraComponent extends PositionComponent {
   final Vector2 size;
   final double waveAmplitude;
   final double waveSpeed;
@@ -1127,7 +1131,7 @@ class AuroraComponent extends Component {
   }
 }
 
-class VineComponent extends Component {
+class VineComponent extends PositionComponent {
   final double length;
   final double swayAmount;
   final double swaySpeed;

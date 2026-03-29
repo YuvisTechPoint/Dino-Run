@@ -48,6 +48,11 @@ class ThemedGround extends PositionComponent with HasGameReference<DinoRun> {
   void _updateGroundForTheme(GameTheme newTheme) {
     _createGroundForTheme(newTheme);
   }
+  
+  /// Update the theme (public method called from game)
+  void updateTheme(GameTheme newTheme) {
+    _updateGroundForTheme(newTheme);
+  }
 
   Color _getGroundColor(GameTheme theme) {
     switch (theme.type) {
@@ -59,6 +64,18 @@ class ThemedGround extends PositionComponent with HasGameReference<DinoRun> {
         return const Color(0xFF654321); // Dark brown earth
       case GameThemeType.city:
         return const Color(0xFF696969); // Asphalt gray
+      case GameThemeType.ocean:
+        return const Color(0xFF006994); // Ocean floor
+      case GameThemeType.space:
+        return const Color(0xFF2F4F4F); // Moon surface
+      case GameThemeType.candy:
+        return const Color(0xFFFFB6C1); // Pink candy
+      case GameThemeType.winter:
+        return const Color(0xFFFFFFFF); // Snow white
+      case GameThemeType.jungle:
+        return const Color(0xFF228B22); // Jungle green
+      case GameThemeType.volcano:
+        return const Color(0xFF8B0000); // Lava red
     }
   }
 
@@ -74,6 +91,18 @@ class ThemedGround extends PositionComponent with HasGameReference<DinoRun> {
         return 'Forest Earth';
       case GameThemeType.city:
         return 'City Asphalt';
+      case GameThemeType.ocean:
+        return 'Ocean Floor';
+      case GameThemeType.space:
+        return 'Moon Surface';
+      case GameThemeType.candy:
+        return 'Candy Land';
+      case GameThemeType.winter:
+        return 'Snow Ground';
+      case GameThemeType.jungle:
+        return 'Jungle Floor';
+      case GameThemeType.volcano:
+        return 'Volcanic Rock';
     }
   }
 
@@ -89,6 +118,18 @@ class ThemedGround extends PositionComponent with HasGameReference<DinoRun> {
         return 'Navigate through the forest earth path';
       case GameThemeType.city:
         return 'Speed along the urban asphalt streets';
+      case GameThemeType.ocean:
+        return 'Swim over the ocean floor';
+      case GameThemeType.space:
+        return 'Float over the moon surface';
+      case GameThemeType.candy:
+        return 'Hop on sweet candy ground';
+      case GameThemeType.winter:
+        return 'Slide on snowy terrain';
+      case GameThemeType.jungle:
+        return 'Trek through jungle floor';
+      case GameThemeType.volcano:
+        return 'Run on volcanic rock';
     }
   }
 }
